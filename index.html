@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exoplanet ML Detection System</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="stars-bg" id="starsContainer"></div>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">
+            <span>🌌</span>
+            <span>ExoDetect ML</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#" class="active" data-page="dashboard">Dashboard</a></li>
+            <li><a href="#" data-page="data">Data</a></li>
+            <li><a href="#" data-page="models">Models</a></li>
+            <li><a href="#" data-page="about">About</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">Quick Actions</div>
+                <button class="sidebar-btn" onclick="showSection('import')">
+                    <span>📁</span>
+                    <span>Import Data</span>
+                </button>
+                <button class="sidebar-btn" onclick="showSection('explore')">
+                    <span>📊</span>
+                    <span>Explore Data</span>
+                </button>
+                <button class="sidebar-btn" onclick="showSection('train')">
+                    <span>🚀</span>
+                    <span>Train Model</span>
+                </button>
+                <button class="sidebar-btn" onclick="showSection('predict')">
+                    <span>🔮</span>
+                    <span>Predict</span>
+                </button>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">Pretrained Models</div>
+                <button class="sidebar-btn" onclick="selectModel('kepler')">
+                    <span>🛰️</span>
+                    <span>Kepler Model</span>
+                </button>
+                <button class="sidebar-btn" onclick="selectModel('k2')">
+                    <span>🛰️</span>
+                    <span>K2 Model</span>
+                </button>
+                <button class="sidebar-btn" onclick="selectModel('tess')">
+                    <span>🛰️</span>
+                    <span>TESS Model</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="content-section active">
+                <h1>Dashboard</h1>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">3</div>
+                        <div class="stat-label">Pretrained Models</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">Datasets Loaded</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">Predictions Made</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">94.2%</div>
+                        <div class="stat-label">Avg Model Accuracy</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">Getting Started</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        Welcome to ExoDetect ML! This system helps you detect exoplanets using machine learning. 
+                        You can import your own data, explore it visually, train custom models, or use our pretrained models.
+                    </p>
+                    <button class="btn btn-primary" onclick="showSection('import')">
+                        Import Your First Dataset
+                    </button>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">Recent Activity</h2>
+                    <div style="color: var(--text-secondary); padding: 2rem; text-align: center;">
+                        No recent activity yet. Start by importing a dataset!
+                    </div>
+                </div>
+            </section>
+
+            <!-- Import Data Section -->
+            <section id="import" class="content-section">
+                <h1>Import Data</h1>
+                
+                <div class="card">
+                    <h2 class="card-title">Upload Dataset</h2>
+                    
+                    <div class="tabs">
+                        <button class="tab active">From Computer</button>
+                        <button class="tab">Sample Datasets</button>
+                    </div>
+
+                    <div class="upload-area" id="uploadArea">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">📤</div>
+                        <h3>Drag & Drop Your Dataset</h3>
+                        <p style="color: var(--text-secondary); margin: 1rem 0;">
+                            or click to browse files
+                        </p>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                            Supported formats: CSV, XLSX, JSON
+                        </p>
+                        <input type="file" id="fileInput" style="display: none;" accept=".csv,.xlsx,.json">
+                    </div>
+
+                    <div class="form-group" style="margin-top: 2rem;">
+                        <label class="form-label">Dataset Source</label>
+                        <select class="form-select">
+                            <option>Select mission dataset...</option>
+                            <option>Kepler Mission</option>
+                            <option>K2 Mission</option>
+                            <option>TESS Mission</option>
+                            <option>Custom Dataset</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-primary">
+                        Process Dataset
+                    </button>
+                </div>
+            </section>
+
+            <!-- Explore Data Section -->
+            <section id="explore" class="content-section">
+                <h1>Data Exploration</h1>
+                
+                <div class="card">
+                    <h2 class="card-title">Dataset Overview</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        No dataset loaded. Please import data first.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">Statistical Summary</h2>
+                    <div class="chart-container">
+                        Statistics will appear here after loading data
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">Feature Distribution</h2>
+                    <div class="chart-container">
+                        Visualizations will appear here after loading data
+                    </div>
+                </div>
+            </section>
+
+            <!-- Train Model Section -->
+            <section id="train" class="content-section">
+            <h1>Train New Model</h1>
+
+            <div class="card">
+                <h2 class="card-title">Model Configuration</h2>
+
+                <div class="form-group">
+                    <label class="form-label">Target Column (Label to Predict)</label>
+                    <select class="form-select" id="targetColumn">
+                        <option value="">Select target column</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Algorithm</label>
+                    <select class="form-select" id="algorithm">
+                        <option value="random_forest">Random Forest</option>
+                        <option value="xgboost">XGBoost</option>
+                        <option value="neural_network">Neural Network</option>
+                        <option value="svm">Support Vector Machine</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Test Split (%)</label>
+                    <input type="number" class="form-input" id="testSplit" value="20" min="10" max="40">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Max Iterations</label>
+                    <input type="number" class="form-input" id="maxIterations" value="100" min="10" max="1000">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Learning Rate</label>
+                    <input type="number" class="form-input" id="learningRate" value="0.01" step="0.001" min="0.001" max="1">
+                </div>
+
+                <button class="btn btn-primary" onclick="startTraining()">
+                    🚀 Start Training
+                </button>
+                <button class="btn btn-secondary" onclick="showSection('explore')">
+                    Back to Exploration
+                </button>
+            </div>
+
+            <div class="card" id="trainingProgress" style="display: none;">
+                <h2 class="card-title">Training Progress</h2>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+                <p style="color: var(--text-secondary); margin-top: 1rem;" id="progressText">
+                    Initializing...
+                </p>
+            </div>
+                        </section>
+
+
+            <!-- Predict Section -->
+            <section id="predict" class="content-section">
+                <h1>Make Predictions</h1>
+                
+                <div class="card">
+                    <h2 class="card-title">Select Model</h2>
+                    <div class="model-grid">
+                        <div class="model-card">
+                            <h3>Kepler Model</h3>
+                            <p style="color: var(--text-secondary); margin: 0.5rem 0;">
+                                Trained on Kepler mission data
+                            </p>
+                            <span class="model-badge badge-trained">Pretrained</span>
+                            <span class="model-badge badge-accuracy">95.3% Acc</span>
+                            <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                                Use Model
+                            </button>
+                        </div>
+                        <div class="model-card">
+                            <h3>K2 Model</h3>
+                            <p style="color: var(--text-secondary); margin: 0.5rem 0;">
+                                Trained on K2 mission data
+                            </p>
+                            <span class="model-badge badge-trained">Pretrained</span>
+                            <span class="model-badge badge-accuracy">93.7% Acc</span>
+                            <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                                Use Model
+                            </button>
+                        </div>
+                        <div class="model-card">
+                            <h3>TESS Model</h3>
+                            <p style="color: var(--text-secondary); margin: 0.5rem 0;">
+                                Trained on TESS mission data
+                            </p>
+                            <span class="model-badge badge-trained">Pretrained</span>
+                            <span class="model-badge badge-accuracy">93.5% Acc</span>
+                            <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                                Use Model
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">Input Data</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        Upload new data to classify or enter parameters manually
+                    </p>
+                    <button class="btn btn-primary">Upload Test Data</button>
+                    <button class="btn btn-secondary">Manual Entry</button>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">Prediction Results</h2>
+                    <div style="color: var(--text-secondary); padding: 2rem; text-align: center;">
+                        Results will appear here after prediction
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/static/script.js"></script>
+    
