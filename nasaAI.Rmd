@@ -1,0 +1,212 @@
+---
+title: "nasaAI"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r}
+# Read the CSV
+data <- read.csv("CumulativeKoiData.csv", header = TRUE)
+
+# Check the first few rows
+head(data)
+
+# Check the number of rows and columns
+dim(data)  # returns c(#rows, #columns)
+
+# See column names
+colnames(data)
+
+# Peek at the structure and types of each column
+str(data)
+
+```
+
+```{r}
+# For data manipulation
+library(dplyr)
+# For machine learning
+library(randomForest)
+# For splitting the dataset
+library(caret)
+
+# Load CSV
+exo_data <- read.csv("CumulativeKoiData.csv")
+
+# Filter only candidate exoplanets
+candidates <- exo_data %>% filter(koi_pdisposition == "CANDIDATE")
+
+# Create label
+candidates$label <- ifelse(candidates$koi_disposition == "CONFIRMED", 1, 0)
+
+# Select numeric features
+features <- c("koi_period", "koi_depth", "koi_prad", "koi_model_snr", 
+              "koi_steff", "koi_srad", "koi_slogg")
+
+# Remove rows with NA
+candidates_clean <- candidates %>% select(all_of(features), label) %>% na.omit()
+
+set.seed(123)  # reproducibility
+trainIndex <- createDataPartition(candidates_clean$label, p = 0.7, list = FALSE)
+train_data <- candidates_clean[trainIndex, ]
+test_data  <- candidates_clean[-trainIndex, ]
+
+rf_model <- randomForest(label ~ ., data = train_data, ntree = 100)
+print(rf_model)
+
+pred <- predict(rf_model, test_data)
+confusionMatrix(as.factor(pred), as.factor(test_data$label))
+
+importance(rf_model)
+varImpPlot(rf_model)
+
+```
+
+
+```{r}
+# 1. Install required packages (only once)
+# install.packages(c("dplyr", "caret", "randomForest"))
+
+# 2. Load libraries
+library(dplyr)
+library(caret)
+library(randomForest)
+
+# 3. Import your dataset (replace with your file path)
+data <- read.csv("CumulativeKoiData.csv")
+
+# 4. Keep only rows with valid labels (binary classification)
+data <- data %>%
+  filter(koi_pdisposition %in% c("CANDIDATE", "FALSE POSITIVE"))
+
+# 5. Prepare target variable
+data$label <- factor(data$koi_pdisposition)
+
+# 6. Pick numeric features (AI model input)
+# (you can modify this list later)
+features <- c("koi_period", "koi_duration", "koi_depth", "koi_prad", "koi_impact")
+data <- data[, c(features, "label")]
+
+# 7. Split data into training (70%) and testing (30%)
+set.seed(42)
+train_index <- createDataPartition(data$label, p = 0.7, list = FALSE)
+train_data <- data[train_index, ]
+test_data  <- data[-train_index, ]
+
+# 8. Train AI model (Random Forest)
+model <- randomForest(label ~ ., data = train_data)
+
+# 9. Make predictions
+pred <- predict(model, newdata = test_data)
+
+# 10. Fix factor level mismatch (important!)
+pred <- factor(pred, levels = levels(test_data$label))
+
+# 11. Evaluate accuracy
+confusionMatrix(pred, test_data$label)
+
+```
+
+```{r}
+library(dplyr)
+library(caret)
+library(randomForest)
+
+# Fill missing numeric and categorical values
+data_clean <- data %>%
+  mutate(
+    across(where(is.numeric), ~ ifelse(is.na(.), median(., na.rm = TRUE), .)),
+    across(where(is.character), ~ ifelse(is.na(.), names(sort(table(.), decreasing = TRUE))[1], .))
+  )
+
+# Train/test split
+set.seed(42)
+train_index <- createDataPartition(data_clean$label, p = 0.7, list = FALSE)
+train_data <- data_clean[train_index, ]
+test_data  <- data_clean[-train_index, ]
+
+# Train Random Forest
+model <- randomForest(label ~ ., data = train_data)
+
+# Predict and evaluate
+pred <- predict(model, newdata = test_data)
+pred <- factor(pred, levels = levels(test_data$label))
+confusionMatrix(pred, test_data$label)
+
+```
+
+```{r}
+library(dplyr)
+library(caret)
+library(randomForest)
+library(gtools) # for combinations
+
+# -------------------------------
+# 1. Load and clean data
+# -------------------------------
+data <- read.csv("CumulativeKoiData.csv")
+
+# Select numeric features and target
+numeric_features <- data %>%
+  select(
+    koi_period, koi_duration, koi_depth, koi_prad, koi_teq, koi_insol,
+    koi_model_snr, koi_impact, koi_steff, koi_slogg, koi_srad,
+    koi_fpflag_nt, koi_fpflag_ss, koi_fpflag_co, koi_fpflag_ec,
+    koi_disposition
+  ) %>%
+  na.omit() %>%
+  filter(koi_disposition %in% c("CANDIDATE", "FALSE POSITIVE"))
+
+numeric_features$koi_disposition <- as.factor(numeric_features$koi_disposition)
+
+# -------------------------------
+# 2. Split into train/test
+# -------------------------------
+set.seed(123)
+train_index <- createDataPartition(numeric_features$koi_disposition, p = 0.7, list = FALSE)
+train_data <- numeric_features[train_index, ]
+test_data  <- numeric_features[-train_index, ]
+
+# -------------------------------
+# 3. Loop through all combinations
+# -------------------------------
+feature_names <- setdiff(names(numeric_features), "koi_disposition")
+results <- data.frame()
+
+for (size in 2:length(feature_names)) {      # try combinations of size 2,3,...
+  combs <- combinations(n = length(feature_names), r = size, v = feature_names)
+  
+  for (i in 1:nrow(combs)) {
+    features <- combs[i, ]
+    
+    # Train Random Forest
+    rf_model <- randomForest(
+      as.formula(paste("koi_disposition ~", paste(features, collapse = "+"))),
+      data = train_data,
+      ntree = 100
+    )
+    
+    # Predict
+    pred <- predict(rf_model, newdata = test_data)
+    cm <- confusionMatrix(pred, test_data$koi_disposition)
+    
+    # Store results
+    results <- rbind(results, data.frame(
+      features = paste(features, collapse = ", "),
+      size = size,
+      accuracy = cm$overall["Accuracy"],
+      kappa = cm$overall["Kappa"]
+    ))
+  }
+}
+
+# -------------------------------
+# 4. Sort and show best results
+# -------------------------------
+results <- results %>%
+  arrange(desc(accuracy), desc(kappa))
+
+head(results, 20)  # top 20 feature sets
+
+```
