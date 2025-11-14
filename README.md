@@ -67,14 +67,6 @@ or using uvicorn:
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-### API Endpoints
-
-*(Documentation section - to be filled with specific endpoint details)*
-
-## Data Requirements
-
-*(Documentation section - to be filled with data format specifications)*
-
 ## Supported Machine Learning Algorithms
 
 * **Random Forest:** Ensemble learning method for classification
