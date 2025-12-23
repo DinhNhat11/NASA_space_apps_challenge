@@ -1,0 +1,39 @@
+# Python cache / build
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.sqlite3
+
+# Virtual environment
+venv/
+.env/
+
+# Build / packaging
+build/
+dist/
+*.egg-info/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.code-workspace
+
+# OS files
+Thumbs.db
+Desktop.ini
+
+# Jupyter / R
+.ipynb_checkpoints/
+*.Rhistory
+*.Rproj.user/
+.claude/
+
+# Data files you don't want in repo (optional)
+*.csv
+*.xlsx
+
+# Node or web build (if any)
+node_modules/
+static/dist/

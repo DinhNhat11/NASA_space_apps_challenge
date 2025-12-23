@@ -219,9 +219,21 @@ def prepare_training_data(df: pd.DataFrame, config: TrainConfig):
     # Prepare X and y
     X = df[feature_cols].copy()
     y = df[config.target_column].copy()
-    
-    # Handle missing values
-    X = X.fillna(X.mean())
+
+    # Handle missing values - fill with column mean for numeric columns
+    for col in X.columns:
+        if X[col].dtype in ['float64', 'int64', 'float32', 'int32']:
+            col_mean = X[col].mean()
+            # If mean is NaN (all values are NaN), fill with 0
+            if pd.isna(col_mean):
+                X[col] = X[col].fillna(0)
+            else:
+                X[col] = X[col].fillna(col_mean)
+        else:
+            X[col] = X[col].fillna(0)
+
+    # Final safety check - fill any remaining NaNs with 0
+    X = X.fillna(0)
     
     # Handle categorical target (encode if needed)
     if y.dtype == 'object':
@@ -430,6 +442,10 @@ async def train_model_background(job_id: str, config: TrainConfig):
         scaler = StandardScaler()
         X_train_scaled = scaler.fit_transform(X_train)
         X_test_scaled = scaler.transform(X_test)
+
+        # Replace any NaN or Inf values that may have been created by scaling
+        X_train_scaled = np.nan_to_num(X_train_scaled, nan=0.0, posinf=0.0, neginf=0.0)
+        X_test_scaled = np.nan_to_num(X_test_scaled, nan=0.0, posinf=0.0, neginf=0.0)
         
         # Train model
         training_jobs[job_id]["progress"] = 50

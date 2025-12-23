@@ -176,61 +176,12 @@
 
             <!-- Train Model Section -->
             <section id="train" class="content-section">
-            <h1>Train New Model</h1>
-
-            <div class="card">
-                <h2 class="card-title">Model Configuration</h2>
-
-                <div class="form-group">
-                    <label class="form-label">Target Column (Label to Predict)</label>
-                    <select class="form-select" id="targetColumn">
-                        <option value="">Select target column</option>
-                    </select>
+                <h1>Train New Model</h1>
+                <div class="card">
+                    <h2 class="card-title">Loading...</h2>
+                    <p style="color: var(--text-secondary);">Please upload a dataset first.</p>
                 </div>
-
-                <div class="form-group">
-                    <label class="form-label">Algorithm</label>
-                    <select class="form-select" id="algorithm">
-                        <option value="random_forest">Random Forest</option>
-                        <option value="xgboost">XGBoost</option>
-                        <option value="neural_network">Neural Network</option>
-                        <option value="svm">Support Vector Machine</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Test Split (%)</label>
-                    <input type="number" class="form-input" id="testSplit" value="20" min="10" max="40">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Max Iterations</label>
-                    <input type="number" class="form-input" id="maxIterations" value="100" min="10" max="1000">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Learning Rate</label>
-                    <input type="number" class="form-input" id="learningRate" value="0.01" step="0.001" min="0.001" max="1">
-                </div>
-
-                <button class="btn btn-primary" onclick="startTraining()">
-                    🚀 Start Training
-                </button>
-                <button class="btn btn-secondary" onclick="showSection('explore')">
-                    Back to Exploration
-                </button>
-            </div>
-
-            <div class="card" id="trainingProgress" style="display: none;">
-                <h2 class="card-title">Training Progress</h2>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
-                </div>
-                <p style="color: var(--text-secondary); margin-top: 1rem;" id="progressText">
-                    Initializing...
-                </p>
-            </div>
-                        </section>
+            </section>
 
 
             <!-- Predict Section -->

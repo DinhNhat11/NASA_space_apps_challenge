@@ -15,23 +15,50 @@
     }
 
     // Navigation
-    // Navigation
 function showSection(sectionId) {
     document.querySelectorAll('.content-section').forEach(section => {
         section.classList.remove('active');
     });
     document.getElementById(sectionId).classList.add('active');
-    
+
     document.querySelectorAll('.sidebar-btn').forEach(btn => {
         btn.classList.remove('active');
     });
     if (event && event.target) {
         event.target.closest('.sidebar-btn')?.classList.add('active');
     }
-    
+
     // Load data for specific sections
     if (sectionId === 'explore' && currentDatasetId) {
         loadExploreData();
+    }
+
+    // Load training interface when navigating to train section
+    if (sectionId === 'train') {
+        if (!currentDatasetId) {
+            alert('Please upload a dataset first');
+            setTimeout(() => showSection('import'), 100);
+            return;
+        }
+
+        // Load explore data if not already loaded
+        if (!exploreData) {
+            fetch(`${API_BASE_URL}/explore/${currentDatasetId}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to load data');
+                    return response.json();
+                })
+                .then(data => {
+                    exploreData = data;
+                    loadTrainingInterface();
+                })
+                .catch(error => {
+                    alert('Failed to load dataset information: ' + error.message);
+                    setTimeout(() => showSection('import'), 100);
+                });
+        } else {
+            loadTrainingInterface();
+        }
     }
 }
 
@@ -88,13 +115,6 @@ function showSection(sectionId) {
     function selectModel(modelName) {
         alert(`${modelName.toUpperCase()} model selected! (Demo mode)`);
     }
-
-    // Training simulation
-    // function startTraining() {
-    //     const progressCard = document.getElementById('trainingProgress');
-    //     const progressFill = document.getElementById('progressFill');
-    //     const progressText = document.getElementById('progressText');
-    // }
 
 
     // ==================== ADDITIONAL CODE - ADD AFTER EXISTING CODE ====================
@@ -507,17 +527,7 @@ document.addEventListener('DOMContentLoaded', function() {
     createStars();
 });
 
-// Load data for specific sections
-if (sectionId === 'explore' && currentDatasetId) {
-    loadExploreData();
-}
-
-
 // ==================== MODEL TRAINING ====================
-
-// Global variable for polling
-// let trainingPollInterval = null;
-// let currentJobId = null;
 
 // Override the existing startTraining function
 function startTraining() {
@@ -837,35 +847,3 @@ function loadTrainingInterface() {
         </div>
     `;
 }
-
-// Update showSection to load training interface when navigating to train
-// Update showSection to load training interface when navigating to train
-const originalShowSection = showSection;
-showSection = async function(sectionId) {
-    originalShowSection(sectionId);
-    
-    // If navigating to train section
-    if (sectionId === 'train') {
-        if (!currentDatasetId) {
-            alert('Please upload a dataset first');
-            showSection('import');
-            return;
-        }
-        
-        // Load explore data if not already loaded
-        if (!exploreData) {
-            try {
-                const response = await fetch(`${API_BASE_URL}/explore/${currentDatasetId}`);
-                if (!response.ok) throw new Error('Failed to load data');
-                exploreData = await response.json();
-            } catch (error) {
-                alert('Failed to load dataset information: ' + error.message);
-                showSection('import');
-                return;
-            }
-        }
-        
-        // Now load the training interface
-        loadTrainingInterface();
-    }
-};
